@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<link href="./css/index1style.css" rel="stylesheet">
+
+<head>
+    <meta charset="UTF-8">
+    <title>typo janchi2019</title>
+    <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-firestore.js"></script>
+    <script src="./js/config.js"></script>
+</head>
+
+<body ng-app="janchi2019" ng-controller="janchiControl">
+    <div id="topmenu">
+        <p id="nowlength">{{textcontents.length}} / {{max_value}}</p>
+    </div>
+    <div id="cloneinput">
+        <h1 id="ttinput" ng-model="inval" ng-attr-style="font-size: {{inval}}vw !important;">{{textcontents}}</h1>
+    </div>
+    <input id="origin_input" ng-model="textcontents" ng-model-options="{ allowInvalid: true }" type="text" maxlength="{{max_value}}" ng-keyup="nam()" autofocus/>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-animate.min.js"></script>
+<script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
+<script>
+    var app = angular.module('janchi2019', ["firebase", "ngAnimate"]);
+    app.controller('janchiControl', function($scope, $firebaseArray, $window) {
+        $scope.textcontents = "";
+        $scope.copycon = $scope.textcontents;
+        $scope.max_value = 50;
+        $scope.max_inval = 22;
+        $scope.min_inval = 5;
+        $scope.inval = 22;
+        $scope.sendmss = function() {
+            if ($scope.textcontents.length < 1) {
+                console.log("no way!");
+                return;
+            } else {
+                db.collection("janchi_data").add({
+                    contents: $scope.textcontents,
+                    date: firebase.firestore.Timestamp.now(),
+                });
+                $scope.textcontents = "";
+            }
+        }
+        $(document).keypress(function(e) {
+            if (e.which == 13) {
+                $scope.sendmss();
+            }
+        });
+        $scope.nam = function() {
+            if ($scope.textcontents.length > 0) {
+                $scope.inval = $scope.max_inval / ($scope.textcontents.length * 0.6);
+                if ($scope.inval < $scope.min_inval) {
+                    $scope.inval = $scope.min_inval;
+                } else if ($scope.inval > $scope.max_inval) {
+                    $scope.inval = $scope.max_inval;
+                }
+                if ($scope.textcontents.length >= $scope.max_value) {
+                    console.log("delete");
+                    $scope.textcontents = $scope.textcontents.slice(0, -1);
+                } else {
+                    return;
+                }
+            }
+            console.log($scope.inval);
+        }
+        $scope.bigsmall = function() {
+            console.log("fuc! ");
+        }
+    });
+</script>
+
+</html>
