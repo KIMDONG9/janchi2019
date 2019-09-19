@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "html2canvas": "^1.0.0-rc.3",
-    "serialport": "^7.1.5"
+    "node-thermal-printer": "^4.1.0",
+    "serialport": "^7.1.5",
+    "thermalprinter": "^0.3.8"
   },
   "devDependencies": {
     "electron-rebuild": "^1.8.6"
