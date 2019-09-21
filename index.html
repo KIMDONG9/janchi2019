@@ -28,10 +28,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-animate.min.js"></script>
 <script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
 <script src="./js/html2canvas_min.js"></script>
+<script src="./js/FileSaver.js"></script>
 <script src="./js/date.js"></script>
+
 <script>
-    var app = angular.module('janchi2019', ["firebase", "ngAnimate"]);  
-    app.controller('janchiControl', function ($scope, $firebaseArray, $window) {
+    var app = angular.module('janchi2019', ["firebase", "ngAnimate"]);
+    var serverUrl = 'http://localhost:3000/';
+    app.controller('janchiControl', function ($scope, $http, $firebaseArray, $window) {
         $scope.textcontents = "";
         $scope.copycon = $scope.textcontents;
         $scope.max_value = 50;
@@ -39,19 +42,31 @@
         $scope.min_inval = 5;
         $scope.inval = 19;
         $scope.exportDiv = function (div) {
-            //div = div[0];
-            html2canvas(div).then(function (canvas) {
-                var myImage = canvas.toDataURL();
-                $scope.downloadURI(myImage, returndate() +".png");
+            html2canvas(div, { scale: 1 }).then(function (canvas) {
+                $scope.data64 = canvas.toDataURL().replace(/\s/g, '+').replace(/^data:image\/png;base64,/, '');
+                console.log($scope.data64);
+                // $scope.data64 = res.data;
+                $http.post(serverUrl, { "valueis": $scope.data64 }).then(function (req) {
+                    console.log("posted successfully");
+                }).catch(function (req) {
+                    console.error("error in posting");
+                });
             })
+
+            // .then(function (request) {
+            //     html2canvas(div, { scale: 1 }).then(function (canvas) {
+            //         var data64 = canvas.toDataURL();
+            //         console.log(data64);
+            //         data64 = data;
+            //         // canvas.toBlob(function (blob) {
+            //         //     saveAs(blob, 'image.png');
+            //         // }) 
+            // })
+            // });
+
+
         }
-        $scope.downloadURI = function (uri, name) {
-            var link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
-            link.click();
-        }
+
         $scope.sendmss = function () {
             if ($scope.textcontents.length < 1) {
                 console.log("no way!");
