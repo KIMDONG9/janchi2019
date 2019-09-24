@@ -13,10 +13,10 @@
 
 <body id="print" ng-app="janchi2019" ng-controller="janchiControl">
 
-    <div id="topmenu">
-        <p id="nowlength">{{textcontents.length}} / {{max_value}}</p>
-    </div>
     <div id="cloneinput">
+        <div id="topmenu">
+            <p id="nowlength">{{textcontents.length}} / {{max_value}}</p>
+        </div>
         <h1 id="ttinput" ng-model="inval" ng-attr-style="font-size: {{inval}}vw !important;">{{textcontents}}</h1>
     </div>
     <input id="origin_input" ng-model="textcontents" ng-model-options="{ allowInvalid: true }" type="text" maxlength="{{max_value}}" ng-keyup="nam()" autofocus />
@@ -26,32 +26,42 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-animate.min.js"></script>
 <script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
 <script src="./js/html2canvas_min.js"></script>
-<script src="./js/date.js"></script>
+<script src="./js/FileSaver.js"></script>
+
 <script>
     var app = angular.module('janchi2019', ["firebase", "ngAnimate"]);
-    app.controller('janchiControl', function($scope, $firebaseArray, $window) {
+    var serverUrl = 'http://localhost:3000/';
+    app.controller('janchiControl', function($scope, $http, $firebaseArray, $window) {
         $scope.textcontents = "";
         $scope.copycon = $scope.textcontents;
         $scope.max_value = 50;
-        $scope.max_inval = 19;
+        $scope.max_inval = 25;
         $scope.min_inval = 5;
-        $scope.inval = 19;
+        $scope.inval = 25;
         $scope.exportDiv = function(div) {
-            //div = div[0];
             html2canvas(div, {
-                scale: 0.36
+                scale: 0.533
             }).then(function(canvas) {
-                var myImage = canvas.toDataURL();
-                $scope.downloadURI(myImage, returndate() + ".png");
+                var rotCanvas = document.createElement("canvas");
+                rotCanvas.width = canvas.height, rotCanvas.height = canvas.width;
+                var rctx = rotCanvas.getContext("2d");
+                rctx.translate(rotCanvas.width * 0.5, rotCanvas.height * 0.5);
+                rctx.rotate(-Math.PI * 0.5);
+                rctx.drawImage(canvas, -canvas.width * 0.5, -canvas.height * 0.5);
+                //가로 캔버스//
+                //$scope.data64 = canvas.toDataURL().replace(/\s/g, '+').replace(/^data:image\/png;base64,/, '');
+                //세로 캔버스//
+                $scope.data64 = rotCanvas.toDataURL().replace(/\s/g, '+').replace(/^data:image\/png;base64,/, '');
+                $http.post(serverUrl, {
+                    "valueis": $scope.data64
+                }).then(function(req) {
+                    console.log("posted successfully");
+                }).catch(function(req) {
+                    console.error("error in posting");
+                });
             })
         }
-        $scope.downloadURI = function(uri, name) {
-            var link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
-            link.click();
-        }
+
         $scope.sendmss = function() {
             if ($scope.textcontents.length < 1) {
                 console.log("no way!");
@@ -61,7 +71,7 @@
                     contents: $scope.textcontents,
                     date: firebase.firestore.Timestamp.now(),
                 });
-                $scope.exportDiv(document.getElementById('ttinput'));
+                $scope.exportDiv(document.getElementById('cloneinput'));
                 $scope.textcontents = "";
             }
         }
