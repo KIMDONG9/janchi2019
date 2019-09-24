@@ -1,4 +1,5 @@
-function returndate() {
+var exports = module.exports = {};
+exports.returndate = function() {
     var date = new Date();
     var year = date.getFullYear();
     var month = date.getMonth() + 1
