@@ -34,9 +34,9 @@
     app.controller('janchiControl', function($scope, $http, $firebaseArray, $window) {
         $scope.textcontents = "";
         $scope.copycon = $scope.textcontents;
-        $scope.max_value = 50;
+        $scope.max_value = 80;
         $scope.max_inval = 25;
-        $scope.min_inval = 5;
+        $scope.min_inval = 6;
         $scope.inval = 25;
         $scope.exportDiv = function(div) {
             html2canvas(div, {
