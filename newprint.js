@@ -17,10 +17,18 @@ const SerialPort = require('serialport');
 //     err => console.error(err)
 // );
 
-const serialPort = new SerialPort('/dev/tty.usbmodem14101', { baudRate: 9600 });
+const serialPort = new SerialPort('/dev/tty.usbmodem14101', { baudRate: 19200 });
 const Printer = require('thermalprinter');
-const printer = new Printer(serialPort);
-var imagePath = "./data_imgsave/201909251208.png";
+const printer = new Printer(serialPort,{
+    maxPrintingDots: 12,
+    heatingTime    : 180,
+    heatingInterval: 180,
+    commandDelay   : 0
+});
+var imagePath = "./data_imgsave/201909282504.png";
 printer.on('ready', () => {
-    printer.printImage(imagePath).print();
+    printer.printImage(imagePath).print(function() {
+        console.log('done');
+        process.exit();
+    });
 })

@@ -59,7 +59,7 @@ body {
     font-size: 50px;
     text-align: center;
     vertical-align: middle;
-    font-family: penbatangM;
+    font-family: penbatangP;
     display: table-cell;
     position: relative;
     padding-left: 10vw;
@@ -88,7 +88,7 @@ body {
     padding: 0px;
     position: absolute;
     font-family: penbatangR;
-    display: table;
+    display: none;
     color: black;
     vertical-align: middle;
     text-align: right;
@@ -116,6 +116,7 @@ body {
     vertical-align: middle;
     font-size: 1vw;
     font-family: penbatangR;
+    color : rgba(0, 0, 0, 0.1);
 }
 
 #origin_input:focus {

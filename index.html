@@ -12,16 +12,17 @@
 </head>
 
 <body id="print" ng-app="janchi2019" ng-controller="janchiControl">
-
+    <div id="topmenu">
+        <p id="nowlength">{{textcontents.length}} / {{max_value}}</p>
+    </div>
     <div id="cloneinput">
-        <div id="topmenu">
-            <p id="nowlength">{{textcontents.length}} / {{max_value}}</p>
-        </div>
         <h1 id="ttinput" ng-model="inval" ng-attr-style="font-size: {{inval}}vw !important;">{{textcontents}}</h1>
     </div>
-    <input id="origin_input" ng-model="textcontents" ng-model-options="{ allowInvalid: true }" type="text" maxlength="{{max_value}}" ng-keyup="nam()" autofocus />
+    <input id="origin_input" ng-model="textcontents" ng-model-options="{ allowInvalid: true }" type="text"
+        maxlength="{{max_value}}" ng-keyup="nam()" autofocus />
 </body>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-animate.min.js"></script>
 <script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
@@ -31,17 +32,23 @@
 <script>
     var app = angular.module('janchi2019', ["firebase", "ngAnimate"]);
     var serverUrl = 'http://localhost:3000/';
-    app.controller('janchiControl', function($scope, $http, $firebaseArray, $window) {
+    app.controller('janchiControl', function ($scope, $http, $firebaseArray, $window) {
         $scope.textcontents = "";
         $scope.copycon = $scope.textcontents;
-        $scope.max_value = 80;
-        $scope.max_inval = 25;
+        $scope.max_value = 15;
+        $scope.max_inval = 6;
         $scope.min_inval = 6;
-        $scope.inval = 25;
-        $scope.exportDiv = function(div) {
+        $scope.inval = 6;
+        $scope.infomodal = false;
+        
+        $scope.printwidth = 384;
+        $scope.Xca = window.innerWidth /  $scope.printwidth;
+        console.log($scope.Xca);
+        //0.533
+        $scope.exportDiv = function (div) {
             html2canvas(div, {
-                scale: 0.533
-            }).then(function(canvas) {
+                scale: 0.5333333
+            }).then(function (canvas) {
                 var rotCanvas = document.createElement("canvas");
                 rotCanvas.width = canvas.height, rotCanvas.height = canvas.width;
                 var rctx = rotCanvas.getContext("2d");
@@ -54,15 +61,18 @@
                 $scope.data64 = rotCanvas.toDataURL().replace(/\s/g, '+').replace(/^data:image\/png;base64,/, '');
                 $http.post(serverUrl, {
                     "valueis": $scope.data64
-                }).then(function(req) {
+                }).then(function (req) {
                     console.log("posted successfully");
-                }).catch(function(req) {
+                    $scope.infomodal = false;
+                    console.log($scope.infomodal);
+                }).catch(function (req) {
                     console.error("error in posting");
                 });
             })
         }
 
-        $scope.sendmss = function() {
+
+        $scope.sendmss = function () {
             if ($scope.textcontents.length < 1) {
                 console.log("no way!");
                 return;
@@ -71,16 +81,18 @@
                     contents: $scope.textcontents,
                     date: firebase.firestore.Timestamp.now(),
                 });
-                $scope.exportDiv(document.getElementById('cloneinput'));
+                $scope.exportDiv(document.getElementById('ttinput'));
                 $scope.textcontents = "";
+                $scope.infomodal = true;
+                console.log($scope.infomodal);
             }
         }
-        $(document).keypress(function(e) {
+        $(document).keypress(function (e) {
             if (e.which == 13) {
                 $scope.sendmss();
             }
         });
-        $scope.nam = function() {
+        $scope.nam = function () {
             if ($scope.textcontents.length > 0) {
                 $scope.inval = $scope.max_inval / ($scope.textcontents.length * 0.6);
                 if ($scope.inval < $scope.min_inval) {
@@ -97,7 +109,7 @@
             }
             console.log($scope.inval);
         }
-        $scope.bigsmall = function() {
+        $scope.bigsmall = function () {
             console.log("fuc! ");
         }
     });
