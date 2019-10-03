@@ -19,7 +19,11 @@
         <h1 id="ttinput" ng-model="inval" ng-attr-style="font-size: {{inval}}vw !important;">{{textcontents}}</h1>
     </div>
     <input id="origin_input" ng-model="textcontents" ng-model-options="{ allowInvalid: true }" type="text"
-        maxlength="{{max_value}}" ng-keyup="nam()" autofocus />
+        maxlength="{{max_value}}" ng-keyup="nam()" autofocus placeholder="{{inputPlaceh}}" />
+
+    <dialog id="Dialog">
+        <p>출력</p>
+    </dialog>
 </body>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -32,22 +36,28 @@
 <script>
     var app = angular.module('janchi2019', ["firebase", "ngAnimate"]);
     var serverUrl = 'http://localhost:3000/';
+    var modal_p = document.getElementById('Dialog');
+
     app.controller('janchiControl', function ($scope, $http, $firebaseArray, $window) {
         $scope.textcontents = "";
         $scope.copycon = $scope.textcontents;
+        $scope.inputPlaceh = "입력해 주세요.";
         $scope.max_value = 15;
         $scope.max_inval = 6;
         $scope.min_inval = 6;
         $scope.inval = 6;
         $scope.infomodal = false;
-        
-        $scope.printwidth = 384;
-        $scope.Xca = window.innerWidth /  $scope.printwidth;
-        console.log($scope.Xca);
+        $scope.y = window.innerHeight;
+        $scope.printHeight = 384;
+        $scope.persentage = (($scope.printHeight * 100) / $scope.y);
+        $scope.zeroPersentage = $scope.persentage / 100;
+        $scope.final_relsut = $scope.y * $scope.zeroPersentage;
+        console.log("how : " + $scope.zeroPersentage + " final result : " + $scope.final_relsut);
+        //modal_p.showModal();
         //0.533
         $scope.exportDiv = function (div) {
             html2canvas(div, {
-                scale: 0.5333333
+                scale: $scope.zeroPersentage
             }).then(function (canvas) {
                 var rotCanvas = document.createElement("canvas");
                 rotCanvas.width = canvas.height, rotCanvas.height = canvas.width;
@@ -64,6 +74,7 @@
                 }).then(function (req) {
                     console.log("posted successfully");
                     $scope.infomodal = false;
+                    modal_p.close();
                     console.log($scope.infomodal);
                 }).catch(function (req) {
                     console.error("error in posting");
@@ -73,19 +84,28 @@
 
 
         $scope.sendmss = function () {
-            if ($scope.textcontents.length < 1) {
-                console.log("no way!");
+            if ($scope.infomodal == true) {
+                console.log("mtn il est en train d'imprimer");
                 return;
             } else {
-                db.collection("janchi_data").add({
-                    contents: $scope.textcontents,
-                    date: firebase.firestore.Timestamp.now(),
-                });
-                $scope.exportDiv(document.getElementById('ttinput'));
-                $scope.textcontents = "";
-                $scope.infomodal = true;
-                console.log($scope.infomodal);
+                if ($scope.textcontents.length < 1) {
+                    console.log("no way!");
+                    return;
+                } else {
+                    db.collection("janchi_data").add({
+                        contents: $scope.textcontents,
+                        date: firebase.firestore.Timestamp.now(),
+                    });
+                    $scope.exportDiv(document.getElementById('ttinput'));
+                    $scope.textcontents = "";
+                    modal_p.showModal();
+                    console.log($scope.infomodal);
+                    document.getElementById('ttinput').autofocus;
+                    document.getElementById('ttinput').placeholder = $scope.inputPlaceh;
+                    $scope.infomodal = true;
+                }
             }
+
         }
         $(document).keypress(function (e) {
             if (e.which == 13) {

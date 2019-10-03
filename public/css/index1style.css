@@ -124,3 +124,32 @@ body {
     border: none;
     outline: none;
 }
+#Dialog{
+    font-family: penbatangM;
+    border : solid 0px black;
+    width: 50vw;
+    min-height: 10vh;
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px !important;
+    font-size: 6vw;
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+dialog::backdrop{
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+::-webkit-input-placeholder { /* Edge */
+    color : rgba(0, 0, 0, 0.1);
+  }
+  
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color : rgba(0, 0, 0, 0.1);
+  }
+  
+  ::placeholder {
+    color : rgba(0, 0, 0, 0.1);
+  }

@@ -54,8 +54,11 @@ serialPort.on('open', () => {
     });
     printer.on('ready', () => {
         console.log("printer ready");
+        var startpath = "./data_imgsave/options/201910022449.png";
+        printer.printImage(startpath).print(function () {
+            console.log('done');
+        });
         app.post('/', function (req, res) {
-
             new Promise(function (resolve, reject) {
                 filename = "./data_imgsave/" + newfiledate.returndate() + ".png";
                 if (filename == null) {
