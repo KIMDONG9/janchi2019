@@ -25,11 +25,10 @@
         <p>출력</p>
     </dialog>
 </body>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-animate.min.js"></script>
-<script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
+<script src="./js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="./js/angular.min.js"></script>
+<script src="./js/angular-animate.min.js"></script>
+<script src="./js/angularfire.min.js"></script>
 <script src="./js/html2canvas_min.js"></script>
 <script src="./js/FileSaver.js"></script>
 
@@ -38,24 +37,26 @@
     var serverUrl = 'http://localhost:3000/';
     var modal_p = document.getElementById('Dialog');
 
-    app.controller('janchiControl', function ($scope, $http, $firebaseArray, $window) {
+    app.controller('janchiControl', function ($scope, $http, $firebaseArray, $window, $timeout) {
         $scope.textcontents = "";
         $scope.copycon = $scope.textcontents;
-        $scope.inputPlaceh = "입력해 주세요.";
-        $scope.max_value = 15;
+        $scope.inputPlaceh = "이곳에 입력해 주세요. 출력은 엔터키";
+        $scope.max_value = 10;
         $scope.max_inval = 6;
-        $scope.min_inval = 6;
+        $scope.min_inval = 4.5;
         $scope.inval = 6;
         $scope.infomodal = false;
-        $scope.y = window.innerHeight;
         $scope.printHeight = 384;
-        $scope.persentage = (($scope.printHeight * 100) / $scope.y);
-        $scope.zeroPersentage = $scope.persentage / 100;
-        $scope.final_relsut = $scope.y * $scope.zeroPersentage;
-        console.log("how : " + $scope.zeroPersentage + " final result : " + $scope.final_relsut);
+
         //modal_p.showModal();
         //0.533
         $scope.exportDiv = function (div) {
+            $scope.y = window.innerHeight;
+            $scope.persentage = (($scope.printHeight * 100) / $scope.y);
+            $scope.zeroPersentage = $scope.persentage / 100;
+            $scope.final_relsut = $scope.y * $scope.zeroPersentage;
+            console.log("how : " + $scope.zeroPersentage + " final result : " + $scope.final_relsut);
+
             html2canvas(div, {
                 scale: $scope.zeroPersentage
             }).then(function (canvas) {
@@ -84,26 +85,24 @@
 
 
         $scope.sendmss = function () {
-            if ($scope.infomodal == true) {
-                console.log("mtn il est en train d'imprimer");
+            if ($scope.textcontents.length < 1) {
+                console.log("no way!");
                 return;
             } else {
-                if ($scope.textcontents.length < 1) {
-                    console.log("no way!");
-                    return;
-                } else {
-                    db.collection("janchi_data").add({
-                        contents: $scope.textcontents,
-                        date: firebase.firestore.Timestamp.now(),
-                    });
-                    $scope.exportDiv(document.getElementById('ttinput'));
-                    $scope.textcontents = "";
-                    modal_p.showModal();
-                    console.log($scope.infomodal);
-                    document.getElementById('ttinput').autofocus;
-                    document.getElementById('ttinput').placeholder = $scope.inputPlaceh;
-                    $scope.infomodal = true;
-                }
+                db.collection("janchi_data").add({
+                    contents: $scope.textcontents,
+                    date: firebase.firestore.Timestamp.now(),
+                });
+                $scope.exportDiv(document.getElementById('ttinput'));
+                $scope.textcontents = "";
+                modal_p.showModal();
+                console.log($scope.infomodal);
+                $scope.infomodal = true;
+                $timeout(function () {
+                    document.getElementById('origin_input').placeholder = $scope.inputPlaceh;
+                    console.log("focus!");
+                    document.getElementById('origin_input').focus();
+                }, 500);
             }
 
         }
@@ -114,7 +113,7 @@
         });
         $scope.nam = function () {
             if ($scope.textcontents.length > 0) {
-                $scope.inval = $scope.max_inval / ($scope.textcontents.length * 0.6);
+                $scope.inval = $scope.max_inval / ($scope.textcontents.length * 0.15);
                 if ($scope.inval < $scope.min_inval) {
                     $scope.inval = $scope.min_inval;
                 } else if ($scope.inval > $scope.max_inval) {
